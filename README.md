@@ -4,7 +4,7 @@ Repositório para um jogo de Blackjack em Python
 ## Objetivo
 Fazer codigo para jogar blackjack e utilizar conhecimentos e bibliotecas em python
 
-## Proximas Meta
+## Proximas Metas
 - Melhorar a Interface gráfica
 - Mensagem de status
 - Comentar o codigo
