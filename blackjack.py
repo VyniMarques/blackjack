@@ -56,11 +56,16 @@ def start_game():
     update_display()
 
 
-def update_display():
+def update_display(show_full_dealer_hand=False):
     player_hand_label.config(
         text=f"Player Hand: {start_hand} = {sum_cards(start_hand)}"
     )
-    dealer_hand_label.config(text=f"Dealer Hand: {dealer_hand[0]}, ?")
+    if show_full_dealer_hand:
+        dealer_hand_label.config(
+            text=f"Dealer Hand: {dealer_hand} = {sum_cards(dealer_hand)}"
+        )
+    else:
+        dealer_hand_label.config(text=f"Dealer Hand: {dealer_hand[0]}, ?")
 
 
 def hit():
@@ -74,6 +79,7 @@ def hit():
 def stand():
     dealer_result = dealer_play(dealer_hand)
     player_result = sum_cards(start_hand)
+    update_display(show_full_dealer_hand=True)
     if dealer_result == 22:
         result_label.config(text="Dealer estourou! Você ganhou!")
     elif player_result == 22:
@@ -84,7 +90,6 @@ def stand():
         result_label.config(text="Você ganhou")
     else:
         result_label.config(text="Empate")
-    update_display()
 
 
 root = Tk()
@@ -95,21 +100,30 @@ start_hand = []
 dealer_hand = []
 
 player_hand_label = Label(root, text="Player Hand: ")
-player_hand_label.grid(row=0, column=0, columnspan=2, padx=10, pady=10)
+player_hand_label.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
 
 dealer_hand_label = Label(root, text="Dealer Hand: ")
-dealer_hand_label.grid(row=1, column=0, columnspan=2, padx=10, pady=10)
+dealer_hand_label.grid(row=1, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
 
 result_label = Label(root, text="")
-result_label.grid(row=2, column=0, columnspan=2, padx=10, pady=10)
+result_label.grid(row=2, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
 
 start_button = Button(root, text="Start Game", command=start_game)
-start_button.grid(row=3, column=0, padx=10, pady=10)
+start_button.grid(row=3, column=0, padx=10, pady=10, sticky="nsew")
 
 hit_button = Button(root, text="Hit", command=hit)
-hit_button.grid(row=4, column=0, padx=10, pady=10)
+hit_button.grid(row=4, column=0, padx=10, pady=10, sticky="nsew")
 
 stand_button = Button(root, text="Stand", command=stand)
-stand_button.grid(row=4, column=1, columnspan=2, padx=10, pady=10)
+stand_button.grid(row=4, column=1, padx=10, pady=10, sticky="nsew")
+
+# Configurar a grade para expandir conforme necessário
+root.grid_columnconfigure(0, weight=1)
+root.grid_columnconfigure(1, weight=1)
+root.grid_rowconfigure(0, weight=1)
+root.grid_rowconfigure(1, weight=1)
+root.grid_rowconfigure(2, weight=1)
+root.grid_rowconfigure(3, weight=1)
+root.grid_rowconfigure(4, weight=1)
 
 root.mainloop()
