@@ -32,6 +32,8 @@ def sum_cards(hand):
             numbers.append(card)
 
     total = sum(numbers)
+    if "A" in hand and total + 10 <= 21:
+        total += 10
     if total > 21:
         total = 22
     return total
@@ -54,6 +56,9 @@ def start_game():
     start_hand = deal(cards)
     dealer_hand = deal(cards)
     update_display()
+    result_label.config(text="")
+    hit_button.config(state=NORMAL)
+    stand_button.config(state=NORMAL)
 
 
 def update_display(show_full_dealer_hand=False):
@@ -73,13 +78,19 @@ def hit():
     start_hand = buy_card(start_hand)
     if sum_cards(start_hand) == 22:
         result_label.config(text="Estourou!")
-    update_display()
+        update_display(show_full_dealer_hand=True)
+        hit_button.config(state=DISABLED)
+        stand_button.config(state=DISABLED)
+    else:
+        update_display()
 
 
 def stand():
     dealer_result = dealer_play(dealer_hand)
     player_result = sum_cards(start_hand)
     update_display(show_full_dealer_hand=True)
+    hit_button.config(state=DISABLED)
+    stand_button.config(state=DISABLED)
     if dealer_result == 22:
         result_label.config(text="Dealer estourou! Você ganhou!")
     elif player_result == 22:
