@@ -4,7 +4,10 @@ from tkinter import *
 cards = [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"] * 4
 
 
+# Embaralhar as cartas
 def deal(cards):
+    if len(cards) < 4:  # Verifica se há cartas suficientes para uma nova rodada
+        reset_deck()
     hand = []
     for i in range(2):
         random.shuffle(cards)
@@ -13,12 +16,21 @@ def deal(cards):
     return hand
 
 
+# Reseta as cartas para a quantidade inicial
+def reset_deck():
+    global cards
+    cards = [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"] * 4
+    random.shuffle(cards)
+
+
+# Comprar cartas
 def buy_card(hand):
     hand.append(cards[0])
     cards.pop(0)
     return hand
 
 
+# Somatorio das cartas
 def sum_cards(hand):
     map_card = {"J": 10, "K": 10, "Q": 10, "A": 1}
     numbers = []
@@ -31,6 +43,7 @@ def sum_cards(hand):
         else:
             numbers.append(card)
 
+    # Resultado / Tratamento do Ás
     total = sum(numbers)
     if "A" in hand and total + 10 <= 21:
         total += 10
@@ -39,6 +52,7 @@ def sum_cards(hand):
     return total
 
 
+# Jogo do dealer
 def dealer_play(dealer):
     total = sum_cards(dealer)
     if total == 22:
@@ -73,6 +87,7 @@ def update_display(show_full_dealer_hand=False):
         dealer_hand_label.config(text=f"Dealer Hand: {dealer_hand[0]}, ?")
 
 
+# Opção de comprar mais cartas
 def hit():
     global start_hand
     start_hand = buy_card(start_hand)
@@ -85,6 +100,7 @@ def hit():
         update_display()
 
 
+# Opção de passar a vez / mostrar resultado
 def stand():
     dealer_result = dealer_play(dealer_hand)
     player_result = sum_cards(start_hand)
@@ -103,9 +119,10 @@ def stand():
         result_label.config(text="Empate")
 
 
+# ============================== Interface gráfica ==============================
 root = Tk()
-root.title("Blackjack")
-root.geometry("300x300")
+root.title("Blackjack ♠️♥️♦️♣️")
+root.geometry("500x300")
 
 start_hand = []
 dealer_hand = []
