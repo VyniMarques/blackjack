@@ -5,6 +5,5 @@ Repositório para um jogo de Blackjack em Python
 Fazer codigo para jogar blackjack e utilizar conhecimentos e bibliotecas em python
 
 ## Proximas Meta
-- Corrigir a saida
-- Utilizar interface gráfica
+- Melhorar a Interface gráfica
 - ...
