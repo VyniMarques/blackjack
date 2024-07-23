@@ -1,5 +1,6 @@
 import random
 from tkinter import *
+from tkinter import ttk
 
 cards = [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"] * 4
 
@@ -16,7 +17,7 @@ def deal(cards):
     return hand
 
 
-# Reseta as cartas para a quantidade inicial
+# Resetar as cartas para a quantidade inicial
 def reset_deck():
     global cards
     cards = [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"] * 4
@@ -124,25 +125,32 @@ root = Tk()
 root.title("Blackjack ♠️♥️♦️♣️")
 root.geometry("500x300")
 
+photo = PhotoImage(file = 'cards.png')
+root.wm_iconphoto(False, photo)
+
+style = ttk.Style()
+style.configure("TButton", font=("Helvetica", 12), padding=10)
+style.configure("TLabel", font=("Helvetica", 12))
+
 start_hand = []
 dealer_hand = []
 
-player_hand_label = Label(root, text="Player Hand: ")
+player_hand_label = ttk.Label(root, text="Player Hand: ")
 player_hand_label.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
 
-dealer_hand_label = Label(root, text="Dealer Hand: ")
+dealer_hand_label = ttk.Label(root, text="Dealer Hand: ")
 dealer_hand_label.grid(row=1, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
 
-result_label = Label(root, text="")
+result_label = ttk.Label(root, text="")
 result_label.grid(row=2, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
 
-start_button = Button(root, text="Start Game", command=start_game)
+start_button = ttk.Button(root, text="Start Game", command=start_game)
 start_button.grid(row=3, column=0, padx=10, pady=10, sticky="nsew")
 
-hit_button = Button(root, text="Hit", command=hit)
+hit_button = ttk.Button(root, text="Hit", command=hit)
 hit_button.grid(row=4, column=0, padx=10, pady=10, sticky="nsew")
 
-stand_button = Button(root, text="Stand", command=stand)
+stand_button = ttk.Button(root, text="Stand", command=stand)
 stand_button.grid(row=4, column=1, padx=10, pady=10, sticky="nsew")
 
 # Configurar a grade para expandir conforme necessário
