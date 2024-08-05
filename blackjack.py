@@ -33,37 +33,46 @@ def buy_card(hand):
 
 # Somatorio das cartas
 def sum_cards(hand):
-    map_card = {"J": 10, "K": 10, "Q": 10, "A": 1}
-    numbers = []
+    map_card = {"J": 10, "K": 10, "Q": 10, "A": 11}
+    aces_count = 0
+    total = 0
 
     for card in hand:
         if isinstance(card, int):
-            numbers.append(card)
+            total += card
         elif card in map_card:
-            numbers.append(map_card[card])
-        else:
-            numbers.append(card)
+            total += map_card[card]
+            if card == "A":
+                aces_count += 1  # Contabiliza quantos Áses existem na mão
 
-    # Resultado / Tratamento do Ás
-    total = sum(numbers)
-    if "A" in hand and total + 10 <= 21:
-        total += 10
-    if total > 21:
-        total = 22
+    # Tratamento do Ás (ajusta o valor ao exceder 21)
+    while total > 21 and aces_count > 0:
+        total -= 10  # Reduz 10 do total, convertendo um Ás de 11 para 1
+        aces_count -= 1
+
     return total
 
 
+# Verifica se a mão inicial é 21
+def is_blackjack(hand):
+    return sum_cards(hand) == 21 and len(hand) == 2
+
+
 # Jogo do dealer
-def dealer_play(dealer):
-    total = sum_cards(dealer)
-    if total == 22:
-        return total
-    elif int(total) < 17:
-        dealer = buy_card(dealer)
-        return dealer_play(dealer)
-    elif total > 21:
-        return total
-    return int(total)
+def dealer_play():
+    global dealer_hand
+    total = sum_cards(dealer_hand)
+
+    # Continuar comprando enquanto o total for menor que 17
+    while total < 17:
+        dealer_hand = buy_card(dealer_hand)
+        total = sum_cards(dealer_hand)
+        update_display(
+            show_full_dealer_hand=True
+        )  # Atualiza a interface após cada compra
+        root.update_idletasks()  # Garante que a interface seja atualizada
+
+    return total
 
 
 def update_display(show_full_dealer_hand=False):
@@ -99,7 +108,7 @@ def hit():
 # Opção de passar a vez / mostrar resultado
 def stand():
     global victories, defeats
-    dealer_result = dealer_play(dealer_hand)
+    dealer_result = dealer_play()
     player_result = sum_cards(start_hand)
     update_display(show_full_dealer_hand=True)
     hit_button.config(state=DISABLED)
@@ -126,9 +135,27 @@ def start_game():
     start_hand = deal(cards)
     dealer_hand = deal(cards)
     update_display()
-    result_label.config(text="")
-    hit_button.config(state=NORMAL)
-    stand_button.config(state=NORMAL)
+
+    # Verificação de Blackjack
+    if is_blackjack(start_hand):
+        if is_blackjack(dealer_hand):
+            result_label.config(text="Empate com Blackjacks!")
+        else:
+            result_label.config(text="Blackjack! Você ganhou!")
+            victories += 1
+        hit_button.config(state=DISABLED)
+        stand_button.config(state=DISABLED)
+        update_display(show_full_dealer_hand=True)
+    elif is_blackjack(dealer_hand):
+        result_label.config(text="Dealer tem um Blackjack. Você perdeu!")
+        defeats += 1
+        hit_button.config(state=DISABLED)
+        stand_button.config(state=DISABLED)
+        update_display(show_full_dealer_hand=True)
+    else:
+        result_label.config(text="")
+        hit_button.config(state=NORMAL)
+        stand_button.config(state=NORMAL)
 
 
 victories = 0
