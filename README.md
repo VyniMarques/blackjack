@@ -8,6 +8,9 @@ Fazer codigo para jogar blackjack e utilizar conhecimentos e bibliotecas em pyth
 - Melhorar a Interface gráfica
 - Mensagem de status
 - Comentar o codigo
+- Adicionar um sistema de apostas
+- Tratar Blackjacks(21 no começo do jogo)
+- Histórico de Jogos
 - ...
 
 ## Concluído
@@ -15,3 +18,4 @@ Fazer codigo para jogar blackjack e utilizar conhecimentos e bibliotecas em pyth
 - Tratamento do Ás(1 ou 11)
 - Validação da entrada(Não comprar depois de estourar)
 - Opção de jogar novamente
+- Contador de vitorias e derrotas
