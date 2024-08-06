@@ -169,7 +169,7 @@ root = Tk()
 root.title("Blackjack ♠️♥️♦️♣️")
 root.geometry("500x300")
 
-photo = PhotoImage(file="cards.png")
+photo = PhotoImage(file="media\cards.png")
 root.wm_iconphoto(False, photo)
 
 style = ttk.Style()
