@@ -94,12 +94,16 @@ def update_display(show_full_dealer_hand=False):
 def hit():
     global start_hand, defeats
     start_hand = buy_card(start_hand)
-    if sum_cards(start_hand) > 21:  # Verifica se o jogador estourou
+    player_total = sum_cards(start_hand)
+
+    if player_total > 21:  # Verifica se o jogador estourou
         result_label.config(text="Estourou!")
         defeats += 1
         update_display(show_full_dealer_hand=True)
         hit_button.config(state=DISABLED)
         stand_button.config(state=DISABLED)
+    elif player_total == 21:  # Se o jogador atingir 21, chama automaticamente o stand
+        stand()
     else:
         update_display()
 
@@ -120,13 +124,13 @@ def stand():
         result_label.config(text="Você estourou!")
         defeats += 1
     elif dealer_result > player_result:
-        result_label.config(text="Dealer ganhou")
+        result_label.config(text="Dealer ganhou!")
         defeats += 1
     elif dealer_result < player_result:
-        result_label.config(text="Você ganhou")
+        result_label.config(text="Você ganhou!")
         victories += 1
     else:
-        result_label.config(text="Empate")
+        result_label.config(text="Empate!")
     update_display(show_full_dealer_hand=True)
 
 
