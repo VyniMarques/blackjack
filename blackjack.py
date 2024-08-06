@@ -31,7 +31,7 @@ def buy_card(hand):
     return hand
 
 
-# Somatorio das cartas
+# Somatório das cartas
 def sum_cards(hand):
     map_card = {"J": 10, "K": 10, "Q": 10, "A": 11}
     aces_count = 0
@@ -94,13 +94,12 @@ def update_display(show_full_dealer_hand=False):
 def hit():
     global start_hand, defeats
     start_hand = buy_card(start_hand)
-    if sum_cards(start_hand) == 22:
+    if sum_cards(start_hand) > 21:  # Verifica se o jogador estourou
         result_label.config(text="Estourou!")
         defeats += 1
         update_display(show_full_dealer_hand=True)
         hit_button.config(state=DISABLED)
         stand_button.config(state=DISABLED)
-        update_display()
     else:
         update_display()
 
@@ -113,10 +112,11 @@ def stand():
     update_display(show_full_dealer_hand=True)
     hit_button.config(state=DISABLED)
     stand_button.config(state=DISABLED)
-    if dealer_result == 22:
+
+    if dealer_result > 21:  # Verifica se o dealer estourou
         result_label.config(text="Dealer estourou! Você ganhou!")
         victories += 1
-    elif player_result == 22:
+    elif player_result > 21:  # Verifica se o jogador estourou
         result_label.config(text="Você estourou!")
         defeats += 1
     elif dealer_result > player_result:
@@ -127,7 +127,7 @@ def stand():
         victories += 1
     else:
         result_label.config(text="Empate")
-    update_display()
+    update_display(show_full_dealer_hand=True)
 
 
 def start_game():
@@ -189,7 +189,6 @@ victories_label.grid(row=3, column=0, columnspan=2, padx=10, pady=10, sticky="ns
 
 defeats_label = ttk.Label(root, text="Defeats: ")
 defeats_label.grid(row=3, column=1, columnspan=2, padx=10, pady=10, sticky="nsew")
-
 
 start_button = ttk.Button(root, text="Start Game", command=start_game)
 start_button.grid(row=4, column=0, padx=10, pady=10, sticky="nsew")
