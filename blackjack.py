@@ -11,32 +11,36 @@ defeats = 0
 
 game_history = []
 
-"""
-TODO:
-    Historico de Partidas:
-        - So esta salvando na opção stand(), não salva para o blackjack no inicio nem no hit()
-        - o arquivo so é criado quando o botao de mostrar o historico é precionado
-        - erro ao apertar o botao de historico sem ter jogado a primeira partida
-"""
 
-
+# Salvar historico
 def save_history(game_info):
     # Criando arquivo de historico
     file = ROOT_PATH / "historico.txt"
-    try:  # Arquivo existe
-        with open(file, "r", encoding="utf-8") as arquivo_existente:
-            open_mode = "a"  # Modo de adição
-    except FileNotFoundError:  # Arquivo não existe
-        open_mode = "w"  # Modo de escrita
-
-    with open(file, open_mode, encoding="utf-8") as arquivo:
-        if open_mode == "w":
-            # Escreve as primeiras linhas se o arquivo foi criado agora
+    if not file.exists():
+        with open(file, "w", encoding="utf-8") as arquivo:
             arquivo.write("====== Historico de Partidas ======\n")
-            arquivo.write(game_info)
-        else:
-            # Adiciona novas linhas se o arquivo já existia
-            arquivo.write(game_info)
+    with open(file, "a", encoding="utf-8") as arquivo:
+        arquivo.write(game_info)
+
+
+# Mostrar o historico
+def show_history():
+    if not game_history:  # Verifica se o histórico está vazio
+        return
+
+    history_window = Toplevel(root)
+    history_window.title("Histórico de Jogos")
+    history_window.geometry("400x300")
+
+    history_text = Text(history_window, wrap=WORD)
+    history_text.pack(expand=YES, fill=BOTH)
+
+    for index, game in enumerate(game_history, 1):
+        game_info = f"Jogo {index}:\n"
+        game_info += f"Mão do Jogador: {game['player_hand']}\n"
+        game_info += f"Mão do Dealer: {game['dealer_hand']}\n"
+        game_info += f"Resultado: {game['result']}\n\n"
+        history_text.insert(END, game_info)
 
 
 # Embaralhar as cartas
@@ -65,7 +69,7 @@ def buy_card(hand):
     return hand
 
 
-# Somatório das cartas
+# Somar cartas
 def sum_cards(hand):
     map_card = {"J": 10, "K": 10, "Q": 10, "A": 11}
     aces_count = 0
@@ -87,7 +91,7 @@ def sum_cards(hand):
     return total
 
 
-# Verifica se a mão inicial é 21
+# Verificar mão inicial
 def is_blackjack(hand):
     return sum_cards(hand) == 21 and len(hand) == 2
 
@@ -125,7 +129,7 @@ def update_display(show_full_dealer_hand=False):
     defeats_label.config(text=f"Defeats: {defeats}")
 
 
-# Opção de comprar mais cartas
+# Comprar mais cartas
 def hit():
     global start_hand, defeats
     start_hand = buy_card(start_hand)
@@ -133,82 +137,65 @@ def hit():
 
     if player_total > 21:  # Verifica se o jogador estourou
         result = "Estourou!"
-        result_label.config(text=result)
         defeats += 1
-        update_display(show_full_dealer_hand=True)
+        result_label.config(text=result)
+        update_display(show_full_dealer_hand=True)  # Atualiza a interface
         hit_button.config(state=DISABLED)
         stand_button.config(state=DISABLED)
+
+        # Salva o histórico apenas uma vez por rodada
+        game_history.append(
+            {
+                "player_hand": start_hand[:],
+                "dealer_hand": dealer_hand[:],
+                "result": result,
+            }
+        )
+        save_history(
+            f"Jogo:\nMão do Jogador: {start_hand}\nMão do Dealer: {dealer_hand}\nResultado: {result}\n\n"
+        )
     elif player_total == 21:  # Se o jogador atingir 21, chama automaticamente o stand
         stand()
     else:
         update_display()
 
-    game_history.append(
-        {
-            "player_hand": start_hand[:],  # Usando [:] para criar uma cópia da lista
-            "dealer_hand": dealer_hand[:],
-            "result": result,
-        }
-    )
 
-
-# Opção de passar a vez / mostrar resultado
+# Passar a vez
 def stand():
     global victories, defeats
     dealer_result = dealer_play()
     player_result = sum_cards(start_hand)
-    update_display(show_full_dealer_hand=True)
     hit_button.config(state=DISABLED)
     stand_button.config(state=DISABLED)
 
     if dealer_result > 21:  # Verifica se o dealer estourou
         result = "Dealer estourou! Você ganhou!"
-        result_label.config(text=result)
         victories += 1
     elif player_result > 21:  # Verifica se o jogador estourou
         result = "Você estourou!"
-        result_label.config(text=result)
         defeats += 1
     elif dealer_result > player_result:
         result = "Dealer ganhou!"
-        result_label.config(text=result)
         defeats += 1
     elif dealer_result < player_result:
         result = "Você ganhou!"
-        result_label.config(text=result)
         victories += 1
     else:
         result = "Empate!"
-        result_label.config(text=result)
-    update_display(show_full_dealer_hand=True)
 
+    result_label.config(text=result)  # Atualiza a mensagem na interface
+    update_display(show_full_dealer_hand=True)  # Atualiza a interface
+
+    # Salva o histórico apenas uma vez por rodada
     game_history.append(
-        {
-            "player_hand": start_hand[:],  # Usando [:] para criar uma cópia da lista
-            "dealer_hand": dealer_hand[:],
-            "result": result,
-        }
+        {"player_hand": start_hand[:], "dealer_hand": dealer_hand[:], "result": result}
+    )
+    save_history(
+        f"Jogo:\nMão do Jogador: {start_hand}\nMão do Dealer: {dealer_hand}\nResultado: {result}\n\n"
     )
 
 
-def show_history():
-    history_window = Toplevel(root)
-    history_window.title("Histórico de Jogos")
-    history_window.geometry("400x300")
-
-    history_text = Text(history_window, wrap=WORD)
-    history_text.pack(expand=YES, fill=BOTH)
-
-    for index, game in enumerate(game_history, 1):
-        game_info = f"Jogo {index}:\n"
-        game_info += f"Mão do Jogador: {game['player_hand']}\n"
-        game_info += f"Mão do Dealer: {game['dealer_hand']}\n"
-        game_info += f"Resultado: {game['result']}\n\n"
-        history_text.insert(END, game_info)
-
-    save_history(game_info)
-
-
+# Começar o jogo
 def start_game():
     global start_hand, dealer_hand, victories, defeats
     start_hand = deal(cards)
@@ -218,19 +205,48 @@ def start_game():
     # Verificação de Blackjack
     if is_blackjack(start_hand):
         if is_blackjack(dealer_hand):
-            result_label.config(text="Empate com Blackjacks!")
+            result = "Empate com Blackjacks!"
         else:
-            result_label.config(text="Blackjack! Você ganhou!")
+            result = "Blackjack! Você ganhou!"
             victories += 1
+
+        result_label.config(
+            text=result
+        )  # Atualiza a interface com a mensagem de Blackjack
+        game_history.append(
+            {
+                "player_hand": start_hand[:],
+                "dealer_hand": dealer_hand[:],
+                "result": result,
+            }
+        )
+        save_history(
+            f"Jogo:\nMão do Jogador: {start_hand}\nMão do Dealer: {dealer_hand}\nResultado: {result}\n\n"
+        )
         hit_button.config(state=DISABLED)
         stand_button.config(state=DISABLED)
-        update_display(show_full_dealer_hand=True)
+        update_display(
+            show_full_dealer_hand=True
+        )  # Atualiza a interface com a mão completa do dealer
     elif is_blackjack(dealer_hand):
-        result_label.config(text="Dealer tem um Blackjack. Você perdeu!")
+        result = "Dealer tem um Blackjack. Você perdeu!"
         defeats += 1
+        result_label.config(text=result)
+        game_history.append(
+            {
+                "player_hand": start_hand[:],
+                "dealer_hand": dealer_hand[:],
+                "result": result,
+            }
+        )
+        save_history(
+            f"Jogo:\nMão do Jogador: {start_hand}\nMão do Dealer: {dealer_hand}\nResultado: {result}\n\n"
+        )
         hit_button.config(state=DISABLED)
         stand_button.config(state=DISABLED)
-        update_display(show_full_dealer_hand=True)
+        update_display(
+            show_full_dealer_hand=True
+        )  # Atualiza a interface com a mão completa do dealer
     else:
         result_label.config(text="")
         hit_button.config(state=NORMAL)
@@ -240,7 +256,7 @@ def start_game():
 # ============================== Interface gráfica ==============================
 root = Tk()
 root.title("Blackjack ♠️♥️♦️♣️")
-root.geometry("500x300")
+root.geometry("600x400")
 
 photo = PhotoImage(file="media\\cards.png")
 root.wm_iconphoto(False, photo)
@@ -276,6 +292,10 @@ hit_button.grid(row=5, column=0, padx=10, pady=10, sticky="nsew")
 stand_button = ttk.Button(root, text="Stand", command=stand)
 stand_button.grid(row=5, column=1, padx=10, pady=10, sticky="nsew")
 
+show_history_button = ttk.Button(root, text="Mostrar Histórico", command=show_history)
+show_history_button.grid(row=6, column=0, padx=10, pady=10, sticky="nsew")
+
+
 # Configurar a grade para expandir conforme necessário
 root.grid_columnconfigure(0, weight=1)
 root.grid_columnconfigure(1, weight=1)
@@ -284,14 +304,7 @@ root.grid_rowconfigure(1, weight=1)
 root.grid_rowconfigure(2, weight=1)
 root.grid_rowconfigure(3, weight=1)
 root.grid_rowconfigure(4, weight=1)
-
-
-show_history_button = ttk.Button(root, text="Mostrar Histórico", command=show_history)
-show_history_button.grid(row=6, column=0, padx=10, pady=10, sticky="nsew")
-
-root.grid_rowconfigure(
-    5, weight=1
-)  # Ajusta o peso da linha para incluir o botão de histórico
-root.grid_rowconfigure(6, weight=1)  # Linha para o botão de histórico
+root.grid_rowconfigure(5, weight=1)
+root.grid_rowconfigure(6, weight=1)
 
 root.mainloop()
