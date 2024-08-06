@@ -10,6 +10,7 @@ Fazer codigo para jogar blackjack e utilizar conhecimentos e bibliotecas em pyth
 - Comentar o codigo
 - Adicionar um sistema de apostas
 - Histórico de Jogos
+- Verificar se as cartas estão resetando
 - ...
 
 ## Concluído
